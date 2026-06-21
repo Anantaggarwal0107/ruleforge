@@ -16,11 +16,64 @@ from models import Rule
 load_dotenv()
 
 
+SEED_RULES = [
+    {
+        "name": "Discount Calculator",
+        "prompt": "Check if order total exceeds 500 and apply a 10% discount",
+        "code": (
+            "def run(data):\n"
+            "    order_total = data.get('order_total', 0)\n"
+            "    if order_total > 500:\n"
+            "        return {\n"
+            "            'discount': 0.10,\n"
+            "            'final_price': round(order_total * 0.90, 2),\n"
+            "            'eligible': True,\n"
+            "        }\n"
+            "    return {\n"
+            "        'discount': 0,\n"
+            "        'final_price': order_total,\n"
+            "        'eligible': False,\n"
+            "    }\n"
+        ),
+    },
+    {
+        "name": "Age Gate",
+        "prompt": "Check if user is 18 or older and return allowed status with message",
+        "code": (
+            "def run(data):\n"
+            "    age = data.get('age', 0)\n"
+            "    if age >= 18:\n"
+            "        return {'allowed': True, 'message': 'Access granted. Welcome!'}\n"
+            "    return {'allowed': False, 'message': 'Access denied. Must be 18 or older.'}\n"
+        ),
+    },
+    {
+        "name": "Email Validator",
+        "prompt": "Validate that an email address contains @ and a dot",
+        "code": (
+            "def run(data):\n"
+            "    email = str(data.get('email', ''))\n"
+            "    valid = '@' in email and '.' in email.split('@')[-1]\n"
+            "    return {\n"
+            "        'valid': valid,\n"
+            "        'message': 'Valid email address.' if valid else 'Invalid email address.',\n"
+            "    }\n"
+        ),
+    },
+]
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db()
     with Session(engine) as session:
         rules = session.exec(select(Rule)).all()
+        if not rules:
+            for seed in SEED_RULES:
+                rule = Rule(name=seed["name"], prompt=seed["prompt"], code=seed["code"])
+                session.add(rule)
+            session.commit()
+            rules = session.exec(select(Rule)).all()
         for rule in rules:
             register_rule_route(app, rule)
     yield
