@@ -1,9 +1,9 @@
+import os
 from sqlmodel import SQLModel, create_engine, Session
 from typing import Generator
 
-DATABASE_URL = "sqlite:///./ruleforge.db"
-
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False}, echo=False)
+DATABASE_URL = os.environ["DATABASE_URL"]
+engine = create_engine(DATABASE_URL)
 
 
 def create_db() -> None:
