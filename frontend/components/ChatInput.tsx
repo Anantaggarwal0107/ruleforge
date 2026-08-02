@@ -50,17 +50,20 @@ export function ChatInput({ onGenerate, isLoading }: ChatInputProps) {
           )}
         </Button>
       </form>
-      <div className="flex flex-wrap gap-2">
-        {EXAMPLE_PROMPTS.map((example) => (
-          <button
-            key={example}
-            type="button"
-            onClick={() => setPrompt(example)}
-            className="rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            {example}
-          </button>
-        ))}
+      <div className="flex flex-col gap-1.5">
+        <p className="text-xs text-muted-foreground font-medium">Try an example:</p>
+        <div className="flex flex-wrap gap-2">
+          {EXAMPLE_PROMPTS.map((example) => (
+            <button
+              key={example}
+              type="button"
+              onClick={() => setPrompt(example)}
+              className="rounded-full border border-indigo-600/30 bg-indigo-600/10 px-3 py-1 text-xs text-indigo-300 hover:bg-indigo-600/20 hover:border-indigo-500/50 hover:text-indigo-200 transition-all duration-150 font-medium"
+            >
+              {example}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

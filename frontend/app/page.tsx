@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MessageSquare, Code2, Zap } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ChatInput } from "@/components/ChatInput";
 import { CodeEditor } from "@/components/CodeEditor";
@@ -42,21 +43,52 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="border-b border-border px-6 py-4">
         <div className="flex items-center gap-3">
-          <span className="text-xl font-bold tracking-tight">RuleForge</span>
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary font-medium">
+          <span className="text-2xl font-bold tracking-tight">RuleForge</span>
+          <span className="rounded-full bg-indigo-600/20 px-2.5 py-0.5 text-xs text-indigo-400 font-semibold border border-indigo-600/30">
             Natural language → Live API
           </span>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Describe a validation or transformation rule, edit the generated code, and deploy it as a real HTTP endpoint.
+        <p className="mt-1 text-sm text-muted-foreground max-w-xl">
+          Turn plain-English descriptions into deployed REST endpoints — powered by Groq. No boilerplate, no infrastructure.
         </p>
       </header>
+
+      {/* How it works */}
+      <div className="border-b border-border bg-muted/30 px-6 py-4">
+        <div className="grid grid-cols-3 gap-4 max-w-4xl">
+          <div className="relative rounded-lg border border-border bg-background p-4">
+            <span className="absolute -top-2.5 -left-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white shadow">1</span>
+            <div className="flex items-center gap-2 mb-1.5">
+              <MessageSquare className="h-4 w-4 text-indigo-400" />
+              <span className="text-sm font-semibold">Describe your rule</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Write what your rule should do in plain English. No coding required.</p>
+          </div>
+          <div className="relative rounded-lg border border-border bg-background p-4">
+            <span className="absolute -top-2.5 -left-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white shadow">2</span>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Code2 className="h-4 w-4 text-indigo-400" />
+              <span className="text-sm font-semibold">Review the code</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Groq generates Python. Edit in Monaco Editor if needed.</p>
+          </div>
+          <div className="relative rounded-lg border border-border bg-background p-4">
+            <span className="absolute -top-2.5 -left-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white shadow">3</span>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Zap className="h-4 w-4 text-indigo-400" />
+              <span className="text-sm font-semibold">Get a live endpoint</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Deploy instantly. Call your rule as a REST API from anywhere.</p>
+          </div>
+        </div>
+      </div>
 
       <main className="flex flex-1 overflow-hidden">
         <div className="flex w-3/5 flex-col gap-6 overflow-y-auto border-r border-border p-6">
           <section>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              1. Describe Your Rule
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white normal-case tracking-normal">1</span>
+              Describe Your Rule
             </h2>
             <ChatInput onGenerate={handleGenerate} isLoading={isGenerating} />
           </section>
@@ -65,8 +97,9 @@ export default function Home() {
             <>
               <Separator />
               <section>
-                <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  2. Review &amp; Edit Code
+                <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white normal-case tracking-normal">2</span>
+                  Review &amp; Edit Code
                 </h2>
                 {isGenerating ? (
                   <div className="flex h-[300px] items-center justify-center rounded-md border border-border bg-muted">
@@ -81,8 +114,9 @@ export default function Home() {
                 <>
                   <Separator />
                   <section>
-                    <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                      3. Name &amp; Deploy
+                    <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white normal-case tracking-normal">3</span>
+                      Name &amp; Deploy
                     </h2>
                     <div className="flex flex-col gap-3">
                       <input
