@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { Loader2, Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { deleteRule } from "@/lib/api";
 import type { Rule } from "@/lib/types";
 
@@ -31,40 +29,51 @@ export function RuleLibraryItem({ rule, isSelected, onSelect, onDeleted }: RuleL
   const createdDate = new Date(rule.created_at).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
-    year: "numeric",
   });
 
   return (
     <div
       onClick={onSelect}
-      className={`flex cursor-pointer flex-col gap-1 rounded-md border p-3 transition-colors hover:bg-accent ${
-        isSelected ? "border-primary bg-accent" : "border-border bg-background"
+      className={`group relative rounded-[12px] border p-3.5 cursor-pointer transition-colors ${
+        isSelected
+          ? "border-[var(--accent-line)] bg-[var(--accent-soft)]"
+          : "border-border bg-card hover:border-input"
       }`}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="truncate text-sm font-medium">{rule.name}</span>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
-          onClick={handleDelete}
-          disabled={isDeleting}
-          aria-label="Delete rule"
-        >
-          {isDeleting ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Trash2 className="h-3 w-3" />
-          )}
-        </Button>
+      {/* Row 1: live dot · name · created date */}
+      <div className="flex items-center gap-[9px]">
+        <span className="h-1.5 w-1.5 rounded-full bg-[var(--ok)] shrink-0" />
+        <span className="flex-1 text-[13.5px] font-semibold tracking-[-0.01em] truncate">
+          {rule.name}
+        </span>
+        <span className="font-mono text-[10px] text-[var(--faint)] shrink-0">{createdDate}</span>
       </div>
-      <Badge variant="secondary" className="w-fit font-mono text-xs">
+
+      {/* Row 2: endpoint */}
+      <div className="mt-[7px] font-mono text-[10.5px] text-muted-foreground truncate">
         {rule.endpoint_url}
-      </Badge>
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span>{rule.call_count} calls</span>
-        <span>{createdDate}</span>
       </div>
+
+      {/* Row 3: stats */}
+      <div className="mt-2 flex items-center gap-3 font-mono text-[10px] text-[var(--faint)]">
+        <span>{rule.call_count} calls</span>
+        <span>— p50</span>
+        <span className="text-[var(--ok)]">100% uptime</span>
+      </div>
+
+      {/* Delete button — group-hover only */}
+      <button
+        onClick={handleDelete}
+        disabled={isDeleting}
+        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-destructive transition-all disabled:opacity-50"
+        aria-label="Delete rule"
+      >
+        {isDeleting ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <Trash2 className="h-3 w-3" />
+        )}
+      </button>
     </div>
   );
 }

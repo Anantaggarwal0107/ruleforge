@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Loader2, Send } from "lucide-react";
 
 const EXAMPLE_PROMPTS = [
   "Reject if age < 18",
-  "Extract all email addresses from text field",
-  "Require name and email fields present",
+  "Extract all email addresses from a text field",
+  "Require name and email to be present",
   "Clamp a numeric value between min and max",
 ];
 
@@ -25,45 +24,58 @@ export function ChatInput({ onGenerate, isLoading }: ChatInputProps) {
     await onGenerate(prompt.trim());
   }
 
+  const hasTyped = prompt.length > 0;
+  const borderClass = hasTyped ? "border-[var(--accent-line)]" : "border-border";
+
+  const buttonLabel = isLoading ? "Generating…" : hasTyped ? "Regenerate" : "Generate rule";
+
   return (
     <div className="flex flex-col gap-3">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <textarea
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-          rows={3}
-          placeholder="Describe your validation or transformation rule in plain English..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          disabled={isLoading}
-        />
-        <Button type="submit" disabled={isLoading || !prompt.trim()}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Send className="mr-2 h-4 w-4" />
-              Generate Rule
-            </>
-          )}
-        </Button>
-      </form>
-      <div className="flex flex-col gap-1.5">
-        <p className="text-xs text-muted-foreground font-medium">Try an example:</p>
-        <div className="flex flex-wrap gap-2">
-          {EXAMPLE_PROMPTS.map((example) => (
+      <form onSubmit={handleSubmit}>
+        <div
+          className={`rounded-[14px] border bg-card shadow-[var(--shadow-panel)] overflow-hidden transition-colors ${borderClass}`}
+        >
+          <textarea
+            className="w-full border-none bg-transparent text-[15px] leading-[1.55] px-[18px] pt-4 pb-1.5 resize-none outline-none placeholder:text-muted-foreground"
+            rows={3}
+            placeholder="e.g. Apply a 12% surcharge when the order total exceeds $500"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            disabled={isLoading}
+          />
+          <div className="flex items-center gap-2.5 px-3 pb-3 pt-1.5">
+            <span className="font-mono text-[10px] text-[var(--faint)]">
+              {prompt.length} chars
+            </span>
+            <span className="flex-1" />
             <button
-              key={example}
-              type="button"
-              onClick={() => setPrompt(example)}
-              className="rounded-full border border-indigo-600/30 bg-indigo-600/10 px-3 py-1 text-xs text-indigo-300 hover:bg-indigo-600/20 hover:border-indigo-500/50 hover:text-indigo-200 transition-all duration-150 font-medium"
+              type="submit"
+              disabled={isLoading || !prompt.trim()}
+              className="flex h-[38px] items-center gap-2 px-[18px] rounded-[10px] bg-gradient-to-b from-amber-500 to-amber-600 text-[#1a1206] font-bold text-[13px] shadow-[0_8px_20px_-8px_rgba(217,119,6,.9)] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 transition-all"
             >
-              {example}
+              {isLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Send className="h-3.5 w-3.5" />
+              )}
+              {buttonLabel}
             </button>
-          ))}
+          </div>
         </div>
+      </form>
+
+      <div className="flex flex-wrap items-center gap-[7px]">
+        <span className="text-[11px] font-medium text-[var(--faint)] mr-0.5">Try:</span>
+        {EXAMPLE_PROMPTS.map((example) => (
+          <button
+            key={example}
+            type="button"
+            onClick={() => setPrompt(example)}
+            className="rounded-full border border-border bg-accent px-3 py-[5px] text-[11.5px] font-medium text-muted-foreground whitespace-nowrap hover:border-[var(--accent-line)] hover:text-[var(--accent-tx)] hover:bg-[var(--accent-soft)] transition-all duration-150"
+          >
+            {example}
+          </button>
+        ))}
       </div>
     </div>
   );

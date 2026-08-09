@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, Loader2, Rocket } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check, Loader2, Rocket } from "lucide-react";
 import { deployRule } from "@/lib/api";
 import type { Rule } from "@/lib/types";
 
@@ -13,46 +12,10 @@ interface DeployButtonProps {
   onDeployed: (rule: Rule) => void;
 }
 
-function DeployCurlBanner({ ruleId }: { ruleId: number }) {
-  const [copied, setCopied] = useState(false);
-  const snippet = `curl -X POST http://localhost:8000/rules/${ruleId}/run \\\n  -H "Content-Type: application/json" \\\n  -d '{"data": {"key": "value"}}'`;
-
-  async function handleCopy() {
-    await navigator.clipboard.writeText(snippet);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <div className="rounded-md border border-green-500/40 bg-green-500/5 p-3">
-      <div className="mb-2 flex items-center gap-2">
-        <Check className="h-3.5 w-3.5 text-green-500" />
-        <span className="text-xs font-medium text-green-600">Rule deployed! Try it with:</span>
-      </div>
-      <div className="relative rounded-md border border-border bg-muted p-2">
-        <pre className="overflow-x-auto pr-8 text-xs text-muted-foreground whitespace-pre-wrap">{snippet}</pre>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="absolute right-1 top-1 h-6 w-6"
-          onClick={handleCopy}
-          aria-label="Copy curl command"
-        >
-          {copied ? (
-            <Check className="h-3 w-3 text-green-500" />
-          ) : (
-            <Copy className="h-3 w-3" />
-          )}
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 export function DeployButton({ name, prompt, code, onDeployed }: DeployButtonProps) {
   const [isDeploying, setIsDeploying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [deployedRuleId, setDeployedRuleId] = useState<number | null>(null);
+  const [isDeployed, setIsDeployed] = useState(false);
 
   async function handleDeploy() {
     if (!code.trim()) {
@@ -64,11 +27,10 @@ export function DeployButton({ name, prompt, code, onDeployed }: DeployButtonPro
       return;
     }
     setError(null);
-    setDeployedRuleId(null);
     setIsDeploying(true);
     try {
       const rule = await deployRule(name.trim(), prompt, code);
-      setDeployedRuleId(rule.id);
+      setIsDeployed(true);
       onDeployed(rule);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deployment failed");
@@ -77,23 +39,20 @@ export function DeployButton({ name, prompt, code, onDeployed }: DeployButtonPro
     }
   }
 
+  const label = isDeploying ? "Deploying…" : isDeployed ? "Deployed" : "Deploy";
+  const Icon = isDeploying ? Loader2 : isDeployed ? Check : Rocket;
+
   return (
     <div className="flex flex-col gap-2">
-      <Button onClick={handleDeploy} disabled={isDeploying} className="w-full">
-        {isDeploying ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Deploying...
-          </>
-        ) : (
-          <>
-            <Rocket className="mr-2 h-4 w-4" />
-            Deploy Rule
-          </>
-        )}
-      </Button>
+      <button
+        onClick={handleDeploy}
+        disabled={isDeploying}
+        className="flex h-[42px] items-center gap-2 px-5 rounded-[11px] bg-foreground text-card font-bold text-[13px] disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+      >
+        <Icon className={`h-3.5 w-3.5 ${isDeploying ? "animate-spin" : ""}`} />
+        {label}
+      </button>
       {error && <p className="text-xs text-destructive">{error}</p>}
-      {deployedRuleId !== null && <DeployCurlBanner ruleId={deployedRuleId} />}
     </div>
   );
 }
